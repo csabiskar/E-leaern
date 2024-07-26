@@ -26,7 +26,7 @@ function Profile() {
         <section className="page profile_page">
             {user && (
               <Fragment>
-                <div className="main">
+                <div className="main ">
                   <div className="image">
                     <img src={ profile } alt="profile" className="img" />
                   </div>
@@ -55,3 +55,4 @@ function Profile() {
 }
 
 export default Profile
+

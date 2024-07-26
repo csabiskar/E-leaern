@@ -1,17 +1,17 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react'
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import appContext from '../context/appContext';
 
 function Courses() {
   const {
     State,
     setMsg,
-    setErrorMsg
+    setErrorMsg,
   } = useContext(appContext);
 
   const {
     WalletAddress,
     ReadContract,
-    WriteContract
+    WriteContract,
   } = State;
 
   const [courses, setCourses] = useState(null);
@@ -19,6 +19,8 @@ function Courses() {
   const [isPurchased, setIsPurchased] = useState(false);
   const [quizzes, setQuizzes] = useState(null);
   const [quizAnswers, setQuizAnswers] = useState({});
+  const [isVideoCompleted, setIsVideoCompleted] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Get all courses
   const getCourses = async () => {
@@ -39,13 +41,11 @@ function Courses() {
   // To view the course details
   const handleViewCourse = async (aCourse) => {
     setViewCourse(aCourse);
-    // To check the course is purchased or not
-    checkCoursePurchased(aCourse)
+    checkCoursePurchased(aCourse);
   }
 
   // To Purchase Course
   const handlePurchaseCourse = async (aCourse) => {
-    // To buy the course
     const tx = await WriteContract.addPurchasedCourse(aCourse[0].toString(), { from: WalletAddress });
     await tx.wait();
     setMsg("Course purchased successfully");
@@ -66,27 +66,37 @@ function Courses() {
     for (const key in quizAnswers) {
       count += 1;
       if (quizAnswers[key].trim() === '') {
-        setErrorMsg("Enter all the fields")
+        setErrorMsg("Enter all the fields");
         return;
       }
     }
-    
+
     if (count == 0 || count < quizzes.length) {
-      setErrorMsg("Enter all the fields")
+      setErrorMsg("Enter all the fields");
       return;
     }
 
     // Calculate score
-    for (let i = 0;i < quizzes.length;i++) {
+    for (let i = 0; i < quizzes.length; i++) {
       if (quizzes[i][5] == quizAnswers[`question_${i + 1}`]) {
         score++;
       }
     }
 
+    // Calculate percentage
+    const percentage = (score / quizzes.length) * 100;
+
     // Send score to the contract
     const tx = await WriteContract.updateScore(score, { from: WalletAddress });
     await tx.wait();
-    setMsg("Your score was updated")
+    setMsg("Your score was updated");
+
+    if (percentage >= 75) {
+      setShowLeaderboard(true);
+    } else {
+      setShowLeaderboard(false);
+    }
+
     setQuizAnswers({});
     setQuizzes(null);
     setIsPurchased(false);
@@ -96,10 +106,10 @@ function Courses() {
   // Card Component
   const Card = () => {
     return (
-      courses && courses.map((aCourse, index) => {
+      courses && courses.map((aCourse) => {
         return (
-          <Fragment>
-            <div className="card" key={aCourse[0].toString()} title={aCourse[2]}>
+          <Fragment key={aCourse[0].toString()}>
+            <div className="card" title={aCourse[2]}>
               <div className="image">
                 <img src={aCourse[1]} alt={aCourse[2]} className="img" />
               </div>
@@ -115,6 +125,10 @@ function Courses() {
 
   // View detail of course
   const ViewCourse = () => {
+    const handleVideoCompletion = () => {
+      setIsVideoCompleted(true);
+    }
+
     return (
       <Fragment>
         <div className="course_details" key={viewCourse[0].toString()}>
@@ -125,6 +139,8 @@ function Courses() {
               setIsPurchased(false);
               setQuizAnswers({});
               setQuizzes(null);
+              setIsVideoCompleted(false);
+              setShowLeaderboard(false);
             }}>X</button>
           </div>
           <div className="main">
@@ -140,13 +156,22 @@ function Courses() {
               {
                 (isPurchased) ? (
                   <Fragment>
-                    {/* To watch course video */}
-                    <a href={viewCourse[4]} className="course_btn" title='watch course' target='_blank'>Watch</a>
-                    {/* To attend the quiz */}
-                    <button className="course_btn" onClick={() => handleGetQuizzes(viewCourse)} title='quiz'>Quiz</button>
+                    <a
+                      href={viewCourse[4]}
+                      className="course_btn"
+                      title='watch course'
+                      target='_blank'
+                      onClick={handleVideoCompletion}
+                    >
+                      Watch
+                    </a>
+                    {
+                      isVideoCompleted && (
+                        <button className="course_btn" onClick={() => handleGetQuizzes(viewCourse)} title='quiz'>Quiz</button>
+                      )
+                    }
                   </Fragment>
                 ) : (
-                  // To purchase the course
                   <button className="course_btn" onClick={() => handlePurchaseCourse(viewCourse)} title='enroll'>Enroll</button>
                 )
               }
@@ -165,8 +190,8 @@ function Courses() {
           {
             quizzes.map((aQuiz, index) => {
               return (
-                <Fragment>
-                  <div className="form_group" key={index}>
+                <Fragment key={index}>
+                  <div className="form_group">
                     <h1 className='title'>{index + 1}. {aQuiz[0]}</h1>
                     <div className="choice">
                       <input
@@ -220,7 +245,7 @@ function Courses() {
               );
             })
           }
-          <input type="submit" value="Submit" className='quiz_btn' onClick={(e) => handleQuizSubmit(e)}/>
+          <input type="submit" value="Submit" className='quiz_btn' onClick={(e) => handleQuizSubmit(e)} />
         </form>
       </Fragment>
     );
@@ -231,21 +256,20 @@ function Courses() {
     <Fragment>
       <section className="page course_page">
         {
-          // View Course
           (viewCourse) ? (
             <Fragment>
               <ViewCourse />
               {quizzes && <Quiz />}
+              {showLeaderboard && <div className="leaderboard">Leaderboard: Your score is above 75%</div>}
             </Fragment>
           ) : null
         }
-        {/* Course Card */}
         <div className="cards">
           {courses && !viewCourse && <Card />}
         </div>
       </section>
-    </Fragment >
+    </Fragment>
   )
 }
 
-export default Courses
+export default Courses;

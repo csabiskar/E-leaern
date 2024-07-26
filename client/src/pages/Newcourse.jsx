@@ -102,11 +102,11 @@ function Newcourse() {
 
   return (
     <Fragment>
-      <section className="page new_course_page">
+      <section className="page new_course_page text-black">
         {/* Course Details Form */}
         <form className='form courseForm' onSubmit={(e) => handleNewCourseSubmit(e)}>
           <div className="form_group">
-            <label htmlFor="id">Id</label>
+            <label htmlFor="id text-black">Id</label>
             <input
               type="number"
               name="id"
