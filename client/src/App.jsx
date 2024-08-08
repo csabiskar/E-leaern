@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { ethers } from "ethers";
 import ABI from "./contractJson/elearn.json";
+import MyERC1155ABI from "./contractJson/MyERC1155.json";
 import appContext from './context/appContext';
 import Router from './router/Router';
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,13 +16,17 @@ function App() {
 
   const initialState = {
     WindowEthereum: false,
-    ContractAddress: "0x44f4b186c2D8a22D4C432Db71e0eC16E54e69396", // Updated contract
+    ContractAddress: "0x1A82549199Ca0c7DF4D0Be0A7Da0e5c46360C136", // Updated contract
+    MyERC1155Address: "0x33901220854072d10b2b9b2bC3ee73F7CBA7C8Bb",
     WalletAddress: null,
     ContractAbi: ABI.abi,
+    MyERC1155Abi: MyERC1155ABI.abi,
     Provider: null,
     Signer: null,
     ReadContract: null,
     WriteContract: null,
+    MyERC1155ReadContract: null,
+    MyERC1155WriteContract: null,
     isAdmin: false,
     isLogin: false,
     userName: null
@@ -66,10 +71,23 @@ function App() {
         Signer
       );
 
+      const MyERC1155ReadContract = new ethers.Contract(
+        State.MyERC1155Address,
+        State.MyERC1155Abi,
+        Provider
+      );
+      const MyERC1155WriteContract = new ethers.Contract(
+        State.MyERC1155Address,
+        State.MyERC1155Abi,
+        Signer
+      );
+
       setState(prevState => ({
         ...prevState,
         ReadContract,
-        WriteContract
+        WriteContract,
+        MyERC1155ReadContract,
+        MyERC1155WriteContract
       }));
 
       const isAdmin = await ReadContract.checkAdmin({ from: WalletAddress });

@@ -1,20 +1,247 @@
+// pragma solidity ^0.8.18;
+
+// contract Contract {
+//     address private provider;
+//     constructor () {
+//         provider = msg.sender;
+//     }
+   
+//     // Structure for User Data
+//     struct Users{
+//         string userName;
+//         uint score;
+//     }
+
+//     // Course structure
+//     struct Courses{
+//         uint id;
+//         string imgsrc;
+//         string title;
+//         string descrip;
+//         string videourl;
+//         uint price;
+//     }
+
+//     // Quiz structure
+//     struct Quiz{
+//         string question;
+//         string choiceA;
+//         string choiceB;
+//         string choiceC;
+//         string choiceD;
+//         string correctAns;
+//     }
+
+//     // Array to record all users address
+//     address[] usersAddress;
+
+//     // Array to record all id of course
+//     uint[] courseIds;
+
+//     // Array to record all Courses
+//     mapping(uint => Courses) courseRecord;
+
+//     // Mapping of address of user to user data
+//     mapping (address => Users) usersRecord;
+
+//     // Quiz Id
+//     uint quizId = 0;
+
+//     // Quiz Mapping
+//     mapping (uint => Quiz[]) public  quizRecord;
+
+//     // Course => Quize mapping
+//     mapping (uint => uint)  public  courseQuizRecord;
+
+//     // Events for Smart Contract
+//     event registerNewUserEvent(address,string,uint,string);
+
+//     // Add user
+//     function registerNewUser(string memory userName) external returns(string memory)  {
+//         if(bytes(usersRecord[msg.sender].userName).length == 0){
+//             usersAddress.push(msg.sender);
+//             usersRecord[msg.sender].userName = userName;
+//             usersRecord[msg.sender].score = 0;
+//             emit registerNewUserEvent(msg.sender,userName,0,"Registration Successful");
+//             return "Registeration Successful!";
+//         }
+//         else
+//         emit registerNewUserEvent(msg.sender,userName,0,"You already have an Account");{
+//             return "You have already have an Account";
+//         }
+//     }
+
+//     // Display User Profile
+//     function displayUserProfile() external view returns(string memory,uint ) {
+//         return (usersRecord[msg.sender].userName,usersRecord[msg.sender].score);
+//     }
+   
+//     mapping(address => mapping(uint256 => bool)) public userCourses;
+
+//     // Add the function to mark a course as purchased for a user
+//     function addPurchasedCourse(uint256 courseId) public {
+//         userCourses[msg.sender][courseId] = true;
+//     }
+
+//     // Add a function to check if a course has been purchased by a user
+//     function hasPurchasedCourse(address user, uint256 courseId) public view returns (bool) {
+//         return userCourses[user][courseId];
+//     }
+//     // // Display Added Users
+//     // function displayAllUsers() external view returns (address[] memory, string[] memory) {
+//     //     require(msg.sender == provider,"Only Provider can access this feature");
+//     //     uint userCount = usersAddress.length;
+//     //     address[] memory addresses = new address[](userCount);
+//     //     string[] memory usernames = new string[](userCount);
+//     //     for (uint i = 0; i < userCount; i++) {
+//     //         addresses[i] = usersAddress[i];
+//     //         usernames[i] = usersRecord[usersAddress[i]].userName;
+//     //     }
+//     //     return (addresses, usernames);
+//     // }
+
+//     // Check for account
+//     function Login() external view returns (bool) {
+//         if(bytes(usersRecord[msg.sender].userName).length == 0){
+//             // User Not Registered
+//             return false;
+//         }
+//         else{
+//             // User Registered
+//             return true;
+//         }
+//     }
+
+//     // Check for admin
+//     function checkAdmin() external view returns(bool){
+//         if(msg.sender == provider){
+//             return true;
+//         }
+//         else{
+//             return false;
+//         }
+//     }
+
+//     // Function to get and store course
+//     function getCourse(uint _id,string memory _imgsrc,string memory _title,string memory _descrip,string memory _videourl,uint _price) external returns(string memory){
+//         if(_id > 0 && bytes(courseRecord[_id].videourl).length == 0){
+//             courseIds.push(_id);
+//             courseRecord[_id].id = _id;
+//             courseRecord[_id].imgsrc = _imgsrc;
+//             courseRecord[_id].title = _title;
+//             courseRecord[_id].descrip = _descrip;
+//             courseRecord[_id].videourl = _videourl;
+//             courseRecord[_id].price = _price;
+//             return "Course Added";
+//         }
+//         else{
+//             return "Cannot Add Course";
+//         }
+//     }
+   
+
+//     // Display All Courses
+//     function displayCourses() external view returns(Courses[] memory){
+//         uint courseLength = courseIds.length;
+//         Courses[] memory course = new Courses[](courseLength);
+//         for(uint i=0; i<courseLength; i++){
+//             course[i] = courseRecord[courseIds[i]];
+//         }
+
+//         return course;
+//     }
+
+//     // To update score of the user
+//     function updateScore( uint _score) public {
+//         usersRecord[msg.sender].score += _score;
+//     }
+
+//     function getDataForLeaderBoard() view public  returns(address[] memory) {
+//         return usersAddress;
+//     }
+
+   
+//     function questionCreation(string memory _question,
+//     string memory _choiceA,
+//     string memory _choiceB,
+//     string memory _choiceC,
+//     string memory _choiceD,
+//     string memory _crcAns
+//     ) public  returns (Quiz memory) {
+//         Quiz memory q = Quiz(_question,_choiceA,_choiceB,_choiceC,_choiceD,_crcAns);
+//         quizId += 1;
+//         quizRecord[quizId].push(q);
+//         return q;
+//     }
+
+//     function quizCreate(uint _courseId,uint _noOfQuestions,Quiz[] memory _quizzes) public  {
+//         quizId += 1;
+//         for (uint i = 0; i < _noOfQuestions; i++)
+//         {
+//             Quiz memory  newq = Quiz(
+//             _quizzes[i].question,
+//             _quizzes[i].choiceA,
+//             _quizzes[i].choiceB,
+//             _quizzes[i].choiceC,
+//             _quizzes[i].choiceD,
+//             _quizzes[i].correctAns);
+//             quizRecord[quizId].push(newq);
+//         }        
+//         courseQuizRecord[_courseId] = quizId;
+
+//     }
+
+//     function getQuizAns(uint _quizId) public view returns(string[] memory) {
+//         uint length = quizRecord[_quizId].length;
+//         string[] memory answers = new string[](length);
+//         for (uint i=0; i < quizRecord[_quizId].length; i++)
+//         {
+//             answers[i] = quizRecord[_quizId][i].correctAns;
+//         }
+//         return answers;
+//     }
+
+//     // Function to get quiz questions for a course
+//     function getQuiz(uint _courseId) public view returns (Quiz[] memory) {
+//         uint quizIdForCourse = courseQuizRecord[_courseId];
+//         return quizRecord[quizIdForCourse];
+//     }
+
+//     // Get leader Board
+//     function getLeaderboard() public view returns (Users[] memory) {
+//         Users[] memory leaderboard = new Users[](usersAddress.length);
+        
+//         for (uint i = 0; i < usersAddress.length; i++) {
+//             address userAddress = usersAddress[i];
+//             leaderboard[i] = usersRecord[userAddress];
+//         }
+        
+//         return leaderboard;
+//     }
+// }
+
+// // Deployed Contract Address: 0xaAE04Cd5c6ed58B1448C359F78f6AF9A3A117812
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
-
+import "./MyERC1155.sol";
 contract Contract {
     address private provider;
-    constructor () {
+    MyERC1155 private myERC1155;
+
+    constructor (address erc1155Address) {
         provider = msg.sender;
+        myERC1155 = MyERC1155(erc1155Address);
     }
-   
+
     // Structure for User Data
-    struct Users{
+    struct Users {
         string userName;
         uint score;
     }
 
     // Course structure
-    struct Courses{
+    struct Courses {
         uint id;
         string imgsrc;
         string title;
@@ -24,7 +251,7 @@ contract Contract {
     }
 
     // Quiz structure
-    struct Quiz{
+    struct Quiz {
         string question;
         string choiceA;
         string choiceB;
@@ -49,34 +276,34 @@ contract Contract {
     uint quizId = 0;
 
     // Quiz Mapping
-    mapping (uint => Quiz[]) public  quizRecord;
+    mapping (uint => Quiz[]) public quizRecord;
 
-    // Course => Quize mapping
-    mapping (uint => uint)  public  courseQuizRecord;
+    // Course => Quiz mapping
+    mapping (uint => uint) public courseQuizRecord;
 
     // Events for Smart Contract
-    event registerNewUserEvent(address,string,uint,string);
+    event registerNewUserEvent(address indexed userAddress, string userName, uint score, string message);
+    event QuizCompleted(address indexed user, uint courseId, bool passed, string message);
 
     // Add user
-    function registerNewUser(string memory userName) external returns(string memory)  {
+    function registerNewUser(string memory userName) external returns(string memory) {
         if(bytes(usersRecord[msg.sender].userName).length == 0){
             usersAddress.push(msg.sender);
             usersRecord[msg.sender].userName = userName;
             usersRecord[msg.sender].score = 0;
-            emit registerNewUserEvent(msg.sender,userName,0,"Registration Successful");
-            return "Registeration Successful!";
-        }
-        else
-        emit registerNewUserEvent(msg.sender,userName,0,"You already have an Account");{
-            return "You have already have an Account";
+            emit registerNewUserEvent(msg.sender, userName, 0, "Registration Successful");
+            return "Registration Successful!";
+        } else {
+            emit registerNewUserEvent(msg.sender, userName, 0, "You already have an Account");
+            return "You already have an Account";
         }
     }
 
     // Display User Profile
-    function displayUserProfile() external view returns(string memory,uint ) {
-        return (usersRecord[msg.sender].userName,usersRecord[msg.sender].score);
+    function displayUserProfile() external view returns(string memory, uint) {
+        return (usersRecord[msg.sender].userName, usersRecord[msg.sender].score);
     }
-   
+
     mapping(address => mapping(uint256 => bool)) public userCourses;
 
     // Add the function to mark a course as purchased for a user
@@ -88,115 +315,66 @@ contract Contract {
     function hasPurchasedCourse(address user, uint256 courseId) public view returns (bool) {
         return userCourses[user][courseId];
     }
-    // // Display Added Users
-    // function displayAllUsers() external view returns (address[] memory, string[] memory) {
-    //     require(msg.sender == provider,"Only Provider can access this feature");
-    //     uint userCount = usersAddress.length;
-    //     address[] memory addresses = new address[](userCount);
-    //     string[] memory usernames = new string[](userCount);
-    //     for (uint i = 0; i < userCount; i++) {
-    //         addresses[i] = usersAddress[i];
-    //         usernames[i] = usersRecord[usersAddress[i]].userName;
-    //     }
-    //     return (addresses, usernames);
-    // }
 
     // Check for account
     function Login() external view returns (bool) {
-        if(bytes(usersRecord[msg.sender].userName).length == 0){
-            // User Not Registered
-            return false;
-        }
-        else{
-            // User Registered
-            return true;
-        }
+        return bytes(usersRecord[msg.sender].userName).length > 0;
     }
 
     // Check for admin
-    function checkAdmin() external view returns(bool){
-        if(msg.sender == provider){
-            return true;
-        }
-        else{
-            return false;
-        }
+    function checkAdmin() external view returns(bool) {
+        return msg.sender == provider;
     }
 
     // Function to get and store course
-    function getCourse(uint _id,string memory _imgsrc,string memory _title,string memory _descrip,string memory _videourl,uint _price) external returns(string memory){
+    function getCourse(uint _id, string memory _imgsrc, string memory _title, string memory _descrip, string memory _videourl, uint _price) external returns(string memory) {
         if(_id > 0 && bytes(courseRecord[_id].videourl).length == 0){
             courseIds.push(_id);
-            courseRecord[_id].id = _id;
-            courseRecord[_id].imgsrc = _imgsrc;
-            courseRecord[_id].title = _title;
-            courseRecord[_id].descrip = _descrip;
-            courseRecord[_id].videourl = _videourl;
-            courseRecord[_id].price = _price;
+            courseRecord[_id] = Courses(_id, _imgsrc, _title, _descrip, _videourl, _price);
             return "Course Added";
-        }
-        else{
+        } else {
             return "Cannot Add Course";
         }
     }
-   
 
     // Display All Courses
-    function displayCourses() external view returns(Courses[] memory){
+    function displayCourses() external view returns(Courses[] memory) {
         uint courseLength = courseIds.length;
         Courses[] memory course = new Courses[](courseLength);
-        for(uint i=0; i<courseLength; i++){
+        for(uint i = 0; i < courseLength; i++) {
             course[i] = courseRecord[courseIds[i]];
         }
-
         return course;
     }
 
     // To update score of the user
-    function updateScore( uint _score) public {
+    function updateScore(uint _score) public {
         usersRecord[msg.sender].score += _score;
     }
 
-    function getDataForLeaderBoard() view public  returns(address[] memory) {
+    function getDataForLeaderBoard() view public returns(address[] memory) {
         return usersAddress;
     }
 
-   
-    function questionCreation(string memory _question,
-    string memory _choiceA,
-    string memory _choiceB,
-    string memory _choiceC,
-    string memory _choiceD,
-    string memory _crcAns
-    ) public  returns (Quiz memory) {
-        Quiz memory q = Quiz(_question,_choiceA,_choiceB,_choiceC,_choiceD,_crcAns);
+    function questionCreation(string memory _question, string memory _choiceA, string memory _choiceB, string memory _choiceC, string memory _choiceD, string memory _crcAns) public returns (Quiz memory) {
+        Quiz memory q = Quiz(_question, _choiceA, _choiceB, _choiceC, _choiceD, _crcAns);
         quizId += 1;
         quizRecord[quizId].push(q);
         return q;
     }
 
-    function quizCreate(uint _courseId,uint _noOfQuestions,Quiz[] memory _quizzes) public  {
+    function quizCreate(uint _courseId, uint _noOfQuestions, Quiz[] memory _quizzes) public {
         quizId += 1;
-        for (uint i = 0; i < _noOfQuestions; i++)
-        {
-            Quiz memory  newq = Quiz(
-            _quizzes[i].question,
-            _quizzes[i].choiceA,
-            _quizzes[i].choiceB,
-            _quizzes[i].choiceC,
-            _quizzes[i].choiceD,
-            _quizzes[i].correctAns);
-            quizRecord[quizId].push(newq);
-        }        
+        for (uint i = 0; i < _noOfQuestions; i++) {
+            quizRecord[quizId].push(_quizzes[i]);
+        }
         courseQuizRecord[_courseId] = quizId;
-
     }
 
     function getQuizAns(uint _quizId) public view returns(string[] memory) {
         uint length = quizRecord[_quizId].length;
         string[] memory answers = new string[](length);
-        for (uint i=0; i < quizRecord[_quizId].length; i++)
-        {
+        for (uint i = 0; i < length; i++) {
             answers[i] = quizRecord[_quizId][i].correctAns;
         }
         return answers;
@@ -209,16 +387,45 @@ contract Contract {
     }
 
     // Get leader Board
-    function getLeaderboard() public view returns (Users[] memory) {
+    function getLeaderboard() public view returns (Users[] memory, uint256[] memory) {
         Users[] memory leaderboard = new Users[](usersAddress.length);
-        
+        uint256[] memory tokenBalances = new uint256[](usersAddress.length);
         for (uint i = 0; i < usersAddress.length; i++) {
             address userAddress = usersAddress[i];
             leaderboard[i] = usersRecord[userAddress];
+            tokenBalances[i] = myERC1155.balanceOf(userAddress, 0);
         }
-        
-        return leaderboard;
+        return (leaderboard, tokenBalances);
+    }
+
+    // Interact with MyERC1155 contract
+    function mintTokens(uint256 tokenId, uint256 amount) external {
+        myERC1155.mint(msg.sender, tokenId, amount, "");
+    }
+
+    function airdropTokens(uint256 tokenId, address[] calldata recipients) external {
+        myERC1155.airdrop(tokenId, recipients);
+    }
+
+    // Function to complete quiz and transfer NFT if passed
+    function completeQuiz(uint _courseId, string[] memory userAnswers) external {
+        uint quizIdForCourse = courseQuizRecord[_courseId];
+        Quiz[] memory quiz = quizRecord[quizIdForCourse];
+        require(userAnswers.length == quiz.length, "Invalid number of answers");
+
+        uint correctCount = 0;
+        for (uint i = 0; i < quiz.length; i++) {
+            if (keccak256(abi.encodePacked(userAnswers[i])) == keccak256(abi.encodePacked(quiz[i].correctAns))) {
+                correctCount++;
+            }
+        }
+
+        bool passed = correctCount == quiz.length;
+
+        if (passed) {
+            myERC1155.safeTransferFrom(provider, msg.sender, 1, 1, "");
+        }
+
+        emit QuizCompleted(msg.sender, _courseId, passed, passed ? "Quiz passed, NFT awarded!" : "Quiz failed, try again.");
     }
 }
-
-// Deployed Contract Address: 0xaAE04Cd5c6ed58B1448C359F78f6AF9A3A117812
